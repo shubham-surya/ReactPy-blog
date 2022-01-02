@@ -10,6 +10,7 @@ services:
       - 3000:3000
     volumes:
       - ./frontend:/user/src/app
+       - /user/src/app/node_modules
   api:
     build: ./backend
     depends_on:

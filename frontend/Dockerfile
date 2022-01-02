@@ -1,14 +1,16 @@
 FROM node:14.18-slim
 
+WORKDIR /user/src/app
+
+ENV PATH /app/node_modules/.bin:$PATH
+
 COPY ./package.json ./
 
 COPY ./package-lock.json ./
 
-RUN npm install --force
+RUN npm install 
 
-WORKDIR /user/src/app
-
-COPY . .
+COPY . ./
 
 EXPOSE 3000
 

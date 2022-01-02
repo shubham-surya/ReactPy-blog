@@ -16,6 +16,9 @@ import IconButton from "@mui/material/IconButton";
 import Collapse from "@mui/material/Collapse";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 
 
 import axios from "axios";
@@ -26,7 +29,7 @@ function Login() {
 	const [values, setValues] = useState({
 		password: "",
 		username: "",
-		showPassword: false,
+		showPassword: true,
 		loading: false,
 	});
 	const [loading, setLoading] = useState(false);
@@ -121,12 +124,23 @@ function Login() {
 						fullWidth
 						name="password"
 						label="Password"
-						type="password"
 						id="password"
+						type={values.showPassword ? "text" : "password"}
 						inputProps={{ minlength: "8" }}
 						onChange={handleChange("password")}
 						autoComplete="current-password"
 					/>
+					<FormGroup>
+						<FormControlLabel
+							control={
+								<Checkbox
+									defaultChecked
+									onChange={handleClickShowPassword}
+								/>
+							}
+							label="Show Password"
+						/>
+					</FormGroup>
 					<LoadingButton
 						type="submit"
 						loading={loading}

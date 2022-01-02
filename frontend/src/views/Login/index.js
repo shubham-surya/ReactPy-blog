@@ -17,6 +17,9 @@ import IconButton from "@mui/material/IconButton";
 import Collapse from "@mui/material/Collapse";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 
 import axios from "axios";
 
@@ -25,7 +28,7 @@ function Login() {
 	const [values, setValues] = useState({
 		password: "",
 		username: "",
-		showPassword: false,
+		showPassword: true,
 	});
 
 	const [loading, setLoading] = useState(false);
@@ -109,7 +112,7 @@ function Login() {
 						<LockOutlinedIcon />
 					</Avatar>
 					<Typography component="h1" variant="h5">
-					Please login to continue
+						Please login to continue
 					</Typography>
 					<TextField
 						margin="normal"
@@ -118,7 +121,7 @@ function Login() {
 						id="username"
 						label="Username"
 						name="username"
-						inputProps={{ minlength: "8" }}
+						inputProps={{ minLength: "8" }}
 						onChange={handleChange("username")}
 						autoFocus
 					/>
@@ -128,12 +131,22 @@ function Login() {
 						fullWidth
 						name="password"
 						label="Password"
-						type="password"
 						id="password"
-						inputProps={{ minlength: "8" }}
+						type={values.showPassword ? "text" : "password"}
+						inputProps={{ minLength: "8" }}
 						onChange={handleChange("password")}
-						autoComplete="current-password"
 					/>
+					<FormGroup>
+						<FormControlLabel
+							control={
+								<Checkbox
+									defaultChecked
+									onChange={handleClickShowPassword}
+								/>
+							}
+							label="Show Password"
+						/>
+					</FormGroup>
 					<LoadingButton
 						type="submit"
 						loading={loading}

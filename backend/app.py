@@ -4,6 +4,7 @@ import json
 from flask_sqlalchemy import SQLAlchemy, inspect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS, cross_origin
+import os
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -13,10 +14,10 @@ ENV = 'dev'
 
 if ENV == 'dev':
     app.debug = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:bakayaro123@localhost/test'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:bakayaro123@db/test'
 else:
     app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = ''
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:bakayaro123@db/test'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -134,6 +135,15 @@ def get_post():
         user = db.session.query(User).filter(User.id == posts.user_id).first()
         post_dict = object_as_dict(posts)
         post_dict.update({'username': user.username})
+        
+        comments = db.session.query(Comment).filter(Comment.post_id == post_id).all()
+        comments_array = []
+        for i in comments:
+            user = db.session.query(User).filter(User.id == i.user_id).first()
+            comm_dict = object_as_dict(i)
+            comm_dict.update({'username': user.username})
+            comments_array.append(comm_dict)
+        post_dict.update({'comments': comments_array})
         array.append(post_dict)
         return jsonify(array), 200
     
@@ -170,20 +180,9 @@ def create_comment():
 
             return 'Success', 200
 
-@app.route('/get_comments', methods=['POST'])
-@cross_origin()
-def get_comments():
-    if request.method == 'POST':
-        post_id = request.form['post_id']
-        array = []
-        comments = db.session.query(Comment).filter(Comment.post_id == post_id).all()
-        for i in comments:
-            user = db.session.query(User).filter(User.id == i.user_id).first()
-            comm_dict = object_as_dict(i)
-            comm_dict.update({'username': user.username})
-            array.append(comm_dict)
-        return jsonify(array), 200
-
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    db.create_all()
+    print("hello")
+    # print(os.environ['SQLALCHEMY_DATABASE_URI'])
+    app.run(debug=True, host='0.0.0.0')

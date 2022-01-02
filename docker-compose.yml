@@ -1,0 +1,35 @@
+version: '3.6'
+services:
+  web:
+    build: ./frontend
+    depends_on:
+      - api
+    networks:
+      - default
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/user/src/app
+  api:
+    build: ./backend
+    depends_on:
+      - db
+    environment:
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:bakayaro123@db:5432/test
+    networks:
+      - default
+    ports:
+      - 5000:5000
+    volumes:
+      - ./backend:/app 
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: bakayaro123
+      POSTGRES_DB: test
+    networks:
+      - default
+    ports:
+      - 5432:5432

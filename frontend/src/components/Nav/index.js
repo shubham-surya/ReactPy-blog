@@ -33,8 +33,12 @@ export default function MenuAppBar() {
 
 	const handleClose = () => {
 		setAnchorEl(null);
-		navigate("/login");
 	};
+
+	const handleLogout = () => {
+		sessionStorage.removeItem("user_data")
+		navigate("/")
+	}
 
 	const handleHome = () => {;
 		navigate("/");
@@ -128,7 +132,7 @@ export default function MenuAppBar() {
 							open={Boolean(anchorEl)}
 							onClose={handleClose}
 						>
-							<MenuItem onClick={handleClose}>My Posts</MenuItem>
+							<MenuItem onClick={handleLogout}>Logout</MenuItem>
 							<MenuItem onClick={handleClose}>
 								My account
 							</MenuItem>

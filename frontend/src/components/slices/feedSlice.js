@@ -7,12 +7,13 @@ const initialState = {
 	status: 'idle',
 	allPosts: [],
     singlePost: [],
+	comments:[],
 };
 
 export const getAllPosts = createAsyncThunk(
 	'posts/getAllPosts',
 	async () => {
-		const url = BASE + 'get_all_posts';
+		const url = 'http://api:5000/get_all_posts';
 		const response = await axios.get(url);
 		return response.data;
 	}
@@ -21,7 +22,6 @@ export const getAllPosts = createAsyncThunk(
 export const getPost = createAsyncThunk(
 	'posts/getPost',
 	async (data) => {
-        console.log(data)
 		const url = BASE + 'get_post';
 		const response = await axios.post(url,data);
 		return response.data;
@@ -31,8 +31,21 @@ export const getPost = createAsyncThunk(
 export const createPost = createAsyncThunk(
 	'posts/createPost',
 	async (data) => {
-        console.log(data)
 		const url = BASE + 'create_post';
+		await axios.post(url,data)
+		.then((data) => {
+			return true
+		})
+		.catch((error) => {
+			return false
+		});
+	}
+)
+
+export const createComment = createAsyncThunk(
+	'posts/createComment',
+	async (data) => {
+		const url = BASE + 'create_comment';
 		await axios.post(url,data)
 		.then((data) => {
 			return true
@@ -66,7 +79,13 @@ export const postDataSlice = createSlice({
 			.addCase(createPost.pending, (state) => {
 				state.status = 'loading';
 			})
-			.addCase(createPost.fulfilled, (state, action) => {
+			.addCase(createPost.fulfilled, (state) => {
+				state.status = 'idle';
+			})
+			.addCase(createComment.pending, (state) => {
+				state.status = 'loading';
+			})
+			.addCase(createComment.fulfilled, (state) => {
 				state.status = 'idle';
 			});
 	},

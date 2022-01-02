@@ -33,6 +33,9 @@ services: db: environment: `POSTGRES_USER` `POSTGRES_PASSWORD` `POSTGRES_DB`
 
 Install my-project with docker-compose.yml
 
+* Clone the project 
+* In the root directory or the folder with contains `docker-compose.yml` run the following commands
+
 ```bash
   docker-compose build
   docker-compose up

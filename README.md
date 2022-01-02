@@ -18,7 +18,23 @@ backend -> Contains Flask server pyhton file (app.py)
 
 ## Installation
 
+#### Environment Variables
+
+Under services: api: environment: `SQLALCHEMY_DATABASE_URI` for connecting to the postgres db
+
+Breakdown is as follows
+
+postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB}
+
+The corresponding variables are set in the db service
+
+services: db: environment: `POSTGRES_USER` `POSTGRES_PASSWORD` `POSTGRES_DB`
+ can be set to any value we want and we need to set the same values in api service `SQLALCHEMY_DATABASE_URI` required for flask to connect to db.
+
 Install my-project with docker-compose.yml
+
+* Clone the project 
+* In the root directory or the folder with contains `docker-compose.yml` run the following commands
 
 ```bash
   docker-compose build

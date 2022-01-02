@@ -13,7 +13,7 @@ const initialState = {
 export const getAllPosts = createAsyncThunk(
 	'posts/getAllPosts',
 	async () => {
-		const url = 'http://api:5000/get_all_posts';
+		const url = BASE + 'get_all_posts';
 		const response = await axios.get(url);
 		return response.data;
 	}

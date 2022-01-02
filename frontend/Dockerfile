@@ -4,9 +4,9 @@ COPY ./package.json ./
 
 COPY ./package-lock.json ./
 
-WORKDIR /user/src/app
+RUN npm install --force
 
-RUN npm install
+WORKDIR /user/src/app
 
 COPY . .
 

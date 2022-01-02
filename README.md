@@ -1,3 +1,4 @@
+
 # ReactPy Blog
 
 A small application in which you can create, view or comment on posts.
@@ -10,9 +11,9 @@ A small application in which you can create, view or comment on posts.
 
 ## Appendix
 
-frontend -> Contains reactjs
+frontend -> Contains reactjs files (create-react-app)
 
-backend -> Contains Flask server
+backend -> Contains Flask server pyhton file (app.py)
 
 
 ## Installation

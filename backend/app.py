@@ -5,6 +5,13 @@ from flask_sqlalchemy import SQLAlchemy, inspect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS, cross_origin
 import os
+import pysolr
+import requests
+from urllib.request import urlopen
+import time
+
+
+solr = pysolr.Solr('http://localhost:8983/solr/postgre')
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -124,6 +131,20 @@ def get_all_posts():
             post_dict.update({'username': user.username})
             array.append(post_dict)
         return jsonify(array), 200
+    
+@app.route('/get_user_posts', methods=['POST'])
+@cross_origin()
+def get_user_posts():
+    if request.method == 'POST':
+        user_id = request.form['id']
+        posts = db.session.query(Post).filter(Post.user_id == user_id).all()
+        array = []
+        for i in posts:
+            user = db.session.query(User).filter(User.id == i.user_id).first()
+            post_dict = object_as_dict(i)
+            post_dict.update({'username': user.username})
+            array.append(post_dict)
+        return jsonify(array), 200
 
 @app.route('/get_post', methods=['POST'])
 @cross_origin()
@@ -179,6 +200,31 @@ def create_comment():
             
 
             return 'Success', 200
+        
+# @app.route('/search', methods=["POST"])
+# def search():
+#     if request.method == "POST":
+#         query = request.form["searchTerm"]
+
+#         # return all results if no data was provided
+#         if query is None or query == "":
+#             query = "*:*"
+            
+#         headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'}
+
+#         url1 = 'http://localhost:8983/solr/postgre/select?indent=true&q.op=OR&q=post_content:test'
+#         # query for information and return results
+#         # connection = "post_content:test"
+#         # connection = urlopen("{}{}".format(BASE_PATH, query))
+#         # with urlopen("{}{}".format(BASE_PATH, query)) as url:
+#         #     data = json.loads(url.read().decode())
+#         #     print(data)
+#             # response = json.loads(results)
+#         # print(connection)
+#         # numresults = response['response']['numFound']
+#         # results = response['response']['docs']
+#         page = solr.search('post_content:test')
+#         return page, 200
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ const Login = React.lazy(() => import("views/Login"))
 const Register = React.lazy(() => import("views/Register"))
 const Home = React.lazy(() => import("views/Home"))
 const Post = React.lazy(() => import("views/Post"))
+const Profile = React.lazy(() => import("views/Profile"))
 const CreatePost = React.lazy(() => import("views/CreatePost"))
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
 							<Route exact={true} path='/' element={<Home/>} />
 							<Route exact={true} path="/post/:id" element={<Post/>} />
 							<Route exact={true} path="/create-post" element={<CreatePost/>} />
+							<Route exact={true} path="/my-posts" element={<Profile/>} />
 							<Route exact={true} path='/login' element={<Login/>} />
 							<Route exact={true} path="/register" element={<Register/>} />
 						</Routes>

@@ -37,7 +37,11 @@ export default function MenuAppBar() {
 
 	const handleLogout = () => {
 		sessionStorage.removeItem("user_data")
-		navigate("/")
+		navigate("/login")
+	}
+
+	const handleProfileNav = () =>{
+		navigate("/my-posts")
 	}
 
 	const handleHome = () => {;
@@ -133,7 +137,7 @@ export default function MenuAppBar() {
 							onClose={handleClose}
 						>
 							<MenuItem onClick={handleLogout}>Logout</MenuItem>
-							<MenuItem onClick={handleClose}>
+							<MenuItem onClick={handleProfileNav}>
 								My account
 							</MenuItem>
 						</Menu>

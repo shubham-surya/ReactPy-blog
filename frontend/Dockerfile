@@ -1,6 +1,6 @@
 FROM node:14.18-slim
 
-WORKDIR /user/src/app
+WORKDIR /app
 
 ENV PATH /app/node_modules/.bin:$PATH
 

@@ -1,10 +1,10 @@
 FROM python:3.9-slim
 
-COPY . /app
+COPY . /pyapp
 
 COPY Pipfile ./Pipfile
 
-WORKDIR /app
+WORKDIR /pyapp
 
 RUN pip install -r ./requirements.txt
 

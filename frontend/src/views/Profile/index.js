@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import PostCard from "components/Card";
 
 // redux
-import { getAllPosts } from "components/slices/feedSlice";
+import { getMyPosts } from "components/slices/feedSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 // router
@@ -29,17 +29,19 @@ import { Grid } from "@mui/material";
 
 const Nav = React.lazy(() => import("components/Nav"));
 
-function Home() {
+function Profile() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const posts = useSelector((state) => state.postData.allPosts);
+	const posts = useSelector((state) => state.postData.myPosts);
 	const status = useSelector((state) => state.postData.status);
 
 	useEffect(() => {
 		if (sessionStorage.getItem("user_data") === null) {
 			navigate("/login");
 		} else {
-			dispatch(getAllPosts());
+            var fd = new FormData()
+            fd.append("id", JSON.parse(sessionStorage.getItem("user_data")).id)
+			dispatch(getMyPosts(fd));
 		}
 	}, []);
 
@@ -48,9 +50,9 @@ function Home() {
 			return (
 				<Typography
 					component="h3"
-					sx={{ color: "#ffffff", marginLeft: 1, textAlign:"center"  }}
+					sx={{ color: "#ffffff", marginLeft: 1, textAlign:"center" }}
 				>
-					Nothing to show here
+					You have not published any posts yet.
 				</Typography>
 			);
 		} else if (status === "loading") {
@@ -100,7 +102,7 @@ function Home() {
 								component="h3"
 								sx={{ color: "#ffffff", marginLeft: 1 }}
 							>
-								Your feed
+								Your posts
 							</Typography>
 						</Avatar>
 						<Tooltip title="Create post" placement="bottom">
@@ -122,4 +124,4 @@ function Home() {
 	);
 }
 
-export default Home;
+export default Profile;

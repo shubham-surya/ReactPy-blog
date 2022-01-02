@@ -31,7 +31,7 @@ export default function PostCard(props) {
 	const [error, setError] = React.useState(false);
 
 	React.useEffect(() => {
-		if (props.data[0].hasOwnProperty("comments")) {
+		if(props.data[0].hasOwnProperty("comments")) {
 			setComments(props.data[0].comments);
 		}
 	}, []);
@@ -48,9 +48,9 @@ export default function PostCard(props) {
 		fd.append("content", content)
 		if(dispatch(createComment(fd))){
 			setComments({comment_content: content, username: JSON.parse(sessionStorage.getItem("user_data")).username})
-			setLoading(false)			
+						
 		}
-		if(dispatch(fd)){
+		else{
 			setLoading(false)
 		}
 	};

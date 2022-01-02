@@ -3,18 +3,20 @@ services:
   web:
     build: ./frontend
     depends_on:
-      - api
+      - "api"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     networks:
       - default
     ports:
       - 3000:3000
     volumes:
-      - ./frontend:/user/src/app
-       - /user/src/app/node_modules
+      - ./frontend:/app
+       - /app/node_modules
   api:
     build: ./backend
     depends_on:
-      - db
+      - "db"
     environment:
       SQLALCHEMY_DATABASE_URI: postgresql://postgres:bakayaro123@db:5432/test
     networks:
@@ -22,7 +24,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - ./backend:/app 
+      - ./backend:/pyapp 
 
   db:
     image: postgres:latest

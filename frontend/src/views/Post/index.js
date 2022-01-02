@@ -48,7 +48,7 @@ function Post() {
 			return (
 				<Typography
 					component="h3"
-					sx={{ color: "#ffffff", marginLeft: 1 }}
+					sx={{ color: "#ffffff", marginLeft: 1, textAlign:"center"  }}
 				>
 					Nothing to show here
 				</Typography>

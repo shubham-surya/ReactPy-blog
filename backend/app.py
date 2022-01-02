@@ -1,57 +1,25 @@
-from flask import Flask, jsonify, request, Response
-from dataclasses import dataclass
+from flask import Flask, jsonify, request
 import json
 from flask_sqlalchemy import SQLAlchemy, inspect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS, cross_origin
 import os
-import pysolr
-import requests
-from urllib.request import urlopen
-import time
 
-
-solr = pysolr.Solr('http://localhost:8983/solr/postgre')
+from models import User, Post, Comment
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
-
-
-ENV = 'dev'
-
-if ENV == 'dev':
-    app.debug = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:bakayaro123@db/test'
-else:
-    app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:bakayaro123@db/test'
-
+    
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-
-def object_as_dict(obj):
-    return {
-        c.key: getattr(obj, c.key) 
-        for c in inspect(obj).mapper.column_attrs
-    }
-
-@dataclass
-class User(db.Model):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(), unique=True, nullable=False)
-    password = db.Column(db.String())
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
+db = SQLAlchemy(app)        
 
 @app.route('/')
 def index():
     return "hello"
 
+# Authentication APIS
 @app.route('/login', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def login():
@@ -85,24 +53,8 @@ def register():
             return 'Success', 200
         else :
             return "Username already exist", 400
-        return '',204
-    
-@dataclass
-class Post(db.Model):
-    __tablename__ = 'post'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship("User", backref=db.backref("user_data", uselist=False))
-    post_title = db.Column(db.String())
-    post_content = db.Column(db.String())
-    comment_count = db.Column(db.Integer)
-
-    def __init__(self, user_id, post_title, post_content, comment_count):
-        self.user_id = user_id
-        self.post_title = post_title
-        self.post_content = post_content
-        self.comment_count = comment_count
         
+# Post APIS
 @app.route('/create_post', methods=['POST'])
 @cross_origin()
 def create_post():
@@ -167,22 +119,8 @@ def get_post():
         post_dict.update({'comments': comments_array})
         array.append(post_dict)
         return jsonify(array), 200
-    
-@dataclass
-class Comment(db.Model):
-    __tablename__ = 'comment'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship("User", backref=db.backref("comment_user_data", uselist=False))
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
-    post = db.relationship("Post", backref=db.backref("post_data", uselist=False))
-    comment_content = db.Column(db.String())
-
-    def __init__(self, user_id, post_id, comment_content):
-        self.user_id = user_id
-        self.post_id = post_id
-        self.comment_content = comment_content
         
+# Comment APIS
 @app.route('/create_comment', methods=['POST'])
 @cross_origin()
 def create_comment():
@@ -200,35 +138,14 @@ def create_comment():
             
 
             return 'Success', 200
-        
-# @app.route('/search', methods=["POST"])
-# def search():
-#     if request.method == "POST":
-#         query = request.form["searchTerm"]
 
-#         # return all results if no data was provided
-#         if query is None or query == "":
-#             query = "*:*"
-            
-#         headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'}
-
-#         url1 = 'http://localhost:8983/solr/postgre/select?indent=true&q.op=OR&q=post_content:test'
-#         # query for information and return results
-#         # connection = "post_content:test"
-#         # connection = urlopen("{}{}".format(BASE_PATH, query))
-#         # with urlopen("{}{}".format(BASE_PATH, query)) as url:
-#         #     data = json.loads(url.read().decode())
-#         #     print(data)
-#             # response = json.loads(results)
-#         # print(connection)
-#         # numresults = response['response']['numFound']
-#         # results = response['response']['docs']
-#         page = solr.search('post_content:test')
-#         return page, 200
-
+#For returning db op obj as dict   
+def object_as_dict(obj):
+    return {
+        c.key: getattr(obj, c.key) 
+        for c in inspect(obj).mapper.column_attrs
+    }
 
 if __name__ == '__main__':
     db.create_all()
-    print("hello")
-    # print(os.environ['SQLALCHEMY_DATABASE_URI'])
     app.run(debug=True, host='0.0.0.0')

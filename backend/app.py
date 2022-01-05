@@ -1,12 +1,12 @@
 from flask import Flask, jsonify, request
-import urllib.request, json, os
+import json
 from flask_sqlalchemy import inspect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS, cross_origin
+import os
 
 from models import User, Post, Comment
 from shared.db import db
-import database
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -29,8 +29,8 @@ def login():
         password = request.form['password']
         if username == '' or password == '':
             return 'Bad Request', 400
-        if database.get_user_count(User, username = username) != 0:
-            user = database.get_user(User, username = username)
+        if db.session.query(User).filter(User.username == username).count() != 0:
+            user = db.session.query(User).filter(User.username == username).first()
             if check_password_hash(user.password, password) :
                 user_details = object_as_dict(user)
                 return json.dumps({"username" : user_details["username"], "id": user_details["id"]} ), 200
@@ -47,9 +47,11 @@ def register():
         password = request.form['password']
         if username == '' or password == '':
             return 'Please fill all he fields', 400
-        if database.get_user_count(User, username = username) == 0:
-            if database.register_user(User, username = username, password = generate_password_hash(password)):
-                return 'Success', 200
+        if db.session.query(User).filter(User.username == username).count() == 0:
+            data = User(username, generate_password_hash(password))
+            db.session.add(data)
+            db.session.commit()
+            return 'Success', 200
         else :
             return "Username already exist", 400
         
@@ -65,17 +67,19 @@ def create_post():
         if post_title == '' or post_content == '':
             return 'Please fill all he fields', 400
         else :
-            database.add_instance(Post, user_id = user_id, post_title = post_title, post_content = post_content, comment_count = comment_count)
+            data = Post(user_id, post_title, post_content, comment_count)
+            db.session.add(data)
+            db.session.commit()
             return 'Success', 200
 
 @app.route('/get_all_posts', methods=['GET'])
 @cross_origin()
 def get_all_posts():
     if request.method == 'GET':
-        posts = database.get_all(Post)
+        posts = db.session.query(Post).all()
         array = []
         for i in posts:
-            user = database.get_user_by_id(User, id = i.user_id)
+            user = db.session.query(User).filter(User.id == i.user_id).first()
             post_dict = object_as_dict(i)
             post_dict.update({'username': user.username})
             array.append(post_dict)
@@ -86,10 +90,10 @@ def get_all_posts():
 def get_user_posts():
     if request.method == 'POST':
         user_id = request.form['id']
-        posts = database.get_user_posts(Post, user_id = user_id)
+        posts = db.session.query(Post).filter(Post.user_id == user_id).all()
         array = []
         for i in posts:
-            user = database.get_user_by_id(User, id = i.user_id)
+            user = db.session.query(User).filter(User.id == i.user_id).first()
             post_dict = object_as_dict(i)
             post_dict.update({'username': user.username})
             array.append(post_dict)
@@ -101,14 +105,15 @@ def get_post():
     if request.method == 'POST':
         post_id = request.form['post_id']
         array = []
-        posts = database.get_first(Post, id = post_id)
-        user = database.get_user_by_id(User, id = posts.user_id)
+        posts = db.session.query(Post).filter(Post.id == post_id).first()
+        user = db.session.query(User).filter(User.id == posts.user_id).first()
         post_dict = object_as_dict(posts)
         post_dict.update({'username': user.username})
-        comments = database.get_all_comments(Comment, post_id = post_id)
+        
+        comments = db.session.query(Comment).filter(Comment.post_id == post_id).all()
         comments_array = []
         for i in comments:
-            user = database.get_user_by_id(User, id = i.user_id)
+            user = db.session.query(User).filter(User.id == i.user_id).first()
             comm_dict = object_as_dict(i)
             comm_dict.update({'username': user.username})
             comments_array.append(comm_dict)
@@ -135,16 +140,6 @@ def create_comment():
 
             return 'Success', 200
 
-# @app.route('/search', methods=['POST'])
-# @cross_origin()
-# def search():
-#     if request.method == 'POST':
-#         search = request.form['search']
-#         with urllib.request.urlopen("http://localhost:8983/solr/postgre/select?indent=true&q.op=OR&q=*/*") as url:
-#             data = json.loads(url.read().decode())
-#             print(data)
-#             return 'Success', 200
-        
 #For returning db op obj as dict   
 def object_as_dict(obj):
     return {

@@ -1,7 +1,5 @@
-import flask_sqlalchemy
 from dataclasses import dataclass
-
-db = flask_sqlalchemy.SQLAlchemy()
+from shared.db import db
 
 @dataclass
 class User(db.Model):

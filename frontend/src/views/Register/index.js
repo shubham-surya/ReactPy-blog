@@ -114,7 +114,7 @@ function Login() {
 						id="username"
 						label="Username"
 						name="username"
-						inputProps={{ minlength: "8" }}
+						inputProps={{ minLength: "8" }}
 						onChange={handleChange("username")}
 						autoFocus
 					/>
@@ -126,7 +126,7 @@ function Login() {
 						label="Password"
 						id="password"
 						type={values.showPassword ? "text" : "password"}
-						inputProps={{ minlength: "8" }}
+						inputProps={{ minLength: "8" }}
 						onChange={handleChange("password")}
 						autoComplete="current-password"
 					/>

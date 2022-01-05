@@ -44,7 +44,7 @@ def edit_instance(model, id, **kwargs):
         setattr(instance, attr, new_value)
     commit_changes()
     
-def register_user(model, id):
+def register_user(model, **kwargs):
     instance = model(**kwargs)
     db.session.add(instance)
     commit_changes()
